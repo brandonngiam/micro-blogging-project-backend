@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 //we have three databases: local, production, in-memory for tests
 const dbURL =
   process.env.NODE_ENV === "production"
-    ? process.env.DATABASE_URL
+    ? process.env.MONGODB_URI
     : global.__MONGO_URI__ || "mongodb://localhost:27017/twitta";
 mongoose.connect(dbURL, { useNewUrlParser: true });
 mongoose.set("useFindAndModify", false);
