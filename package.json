@@ -5,6 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start:dev": "nodemon server.js",
+    "start": "NODE_ENV=production node server.js",
     "test": "jest --runInBand",
     "test:watch": "jest --watch"
   },
