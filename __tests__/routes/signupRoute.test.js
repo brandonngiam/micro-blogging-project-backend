@@ -2,6 +2,8 @@ const app = require("../../src/app");
 const request = require("supertest");
 const { MongoClient } = require("mongodb");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const secret_key = require("../../src/util/key");
 
 describe("Signup route", () => {
   let connection;
@@ -36,6 +38,10 @@ describe("Signup route", () => {
     const found = await twittausers.findOne(newUser);
     expect(response.status).toEqual(201);
     expect(found.username).toEqual(newUser.username);
+
+    const token = response.body.jwt;
+    const decoded = jwt.verify(token, secret_key);
+    expect(decoded.user).toEqual(newUser.username);
   });
 
   it("POST /signup should not create a new user if username already exists", async () => {

@@ -2,6 +2,8 @@ const express = require("express");
 const signupRouter = express.Router();
 const TwittaUser = require("../models/user.model");
 const Joi = require("@hapi/joi");
+const jwt = require("jsonwebtoken");
+const secret_key = require("../util/key");
 
 signupRouter.post("/", async (req, res, next) => {
   try {
@@ -12,7 +14,16 @@ signupRouter.post("/", async (req, res, next) => {
       const found = await TwittaUser.findOne({ username: username });
       if (!found) {
         await TwittaUser.create({ username, password });
-        res.sendStatus(201);
+        const newUser = await TwittaUser.findOne({ username: username });
+
+        const token = jwt.sign(
+          { sub: newUser._id, iat: new Date().getTime(), user: username },
+          secret_key,
+          {
+            expiresIn: 60 * 60
+          }
+        );
+        res.status(201).json({ jwt: token });
       } else {
         res.status(400).json({ err: "Username already taken" });
       }

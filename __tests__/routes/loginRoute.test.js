@@ -3,6 +3,8 @@ const request = require("supertest");
 const mockData = require("../../data/mockData");
 const { MongoClient } = require("mongodb");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
+const secret_key = require("../../src/util/key");
 
 describe("Login route", () => {
   let connection;
@@ -35,6 +37,9 @@ describe("Login route", () => {
       .send({ username: "brandonnnn", password: "Abcde1234." });
 
     expect(response.status).toEqual(200);
+    const token = response.body.jwt;
+    const decoded = jwt.verify(token, secret_key);
+    expect(decoded.user).toEqual("brandonnnn");
   });
 
   it("POST /login should not be able to login successfully if username not found", async () => {
