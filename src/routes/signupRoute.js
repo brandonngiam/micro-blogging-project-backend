@@ -5,6 +5,7 @@ const Joi = require("@hapi/joi");
 const jwt = require("jsonwebtoken");
 const secret_key = require("../util/key");
 const bcrypt = require("bcrypt");
+const settings = require("../util/settings");
 
 signupRouter.post("/", async (req, res, next) => {
   try {
@@ -21,7 +22,7 @@ signupRouter.post("/", async (req, res, next) => {
           { sub: newUser._id, iat: new Date().getTime(), user: username },
           secret_key,
           {
-            expiresIn: 1000 * 60 * 5
+            expiresIn: settings.tokenSessionTime
           }
         );
         res.status(201).json({ jwt: token });

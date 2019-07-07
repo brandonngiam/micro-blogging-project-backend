@@ -4,6 +4,7 @@ const TwittaUser = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const secret_key = require("../util/key");
 const bcrypt = require("bcrypt");
+const settings = require("../util/settings");
 
 loginRouter.post("/", async (req, res, next) => {
   try {
