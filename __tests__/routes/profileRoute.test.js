@@ -96,6 +96,7 @@ describe("profile route", () => {
     const twittausers = await db.collection("twittausers");
     const found = await twittausers.findOne({ username: "brandonnnn" });
     expect(found.twits[0].twit).toEqual(newTwit.twit);
+    expect(found.activities[0].activity).toEqual("twit");
   });
 
   it("POST /:usr should return 400 if twit is > 140 characters", async () => {
@@ -301,38 +302,15 @@ describe("profile route", () => {
       .send({ username: "brandonnnn", password: "Abcde1234." });
 
     const twitUpdate = {
-      _id: "5d1af4b5b583bc6aad75428a",
+      _id: "5d1af5d8f118c26d25aa6139",
       twit: "Updated Twit"
     };
 
-    const twittausers = await db.collection("twittausers");
-    const foundOldTwits = (await twittausers.findOne({
-      username: "brandonnnn"
-    })).twits;
-    const oldTwit = foundOldTwits.find(
-      twit => twit._id.toString() === twitUpdate._id
-    );
-
     const response = await request(app)
-      .put("/u/brandonnnn")
+      .put("/u/sally1988")
       .send(twitUpdate)
       .set("Authorization", "Bearer " + responseLogin.body.jwt);
 
-    const foundNewTwits = (await twittausers.findOne({
-      username: "brandonnnn"
-    })).twits;
-    const newTwit = foundNewTwits.find(twit => twit =>
-      twit._id.toString() === twitUpdate._id
-    );
-    const newIndex = foundNewTwits.findIndex(twit => twit =>
-      twit._id.toString() === twitUpdate._id
-    );
-
-    expect(response.status).toEqual(200);
-    expect(response.body.twit).toEqual(twitUpdate.twit);
-    expect(oldTwit.twit).not.toEqual(twitUpdate.twit);
-    expect(newTwit.twit).toEqual(twitUpdate.twit);
-    expect(foundOldTwits.length).toEqual(foundNewTwits.length);
-    expect(newIndex).toEqual(0);
+    expect(response.status).toEqual(401);
   });
 });

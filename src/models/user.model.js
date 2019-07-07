@@ -6,6 +6,11 @@ const twitSchema = new mongoose.Schema({
   timeStamp: { type: Date, default: Date.now }
 });
 
+const activitySchema = new mongoose.Schema({
+  activity: { type: String, required: true },
+  timeStamp: { type: Date, default: Date.now }
+});
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -24,7 +29,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  twits: [twitSchema]
+  twits: [twitSchema],
+  activities: [activitySchema]
 });
 
 const TwittaUser = mongoose.model("TwittaUser", userSchema);

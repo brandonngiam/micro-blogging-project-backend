@@ -42,6 +42,8 @@ describe("Signup route", () => {
     };
     const found = await twittausers.findOne(userWithHash);
     expect(response.status).toEqual(201);
+    expect(found.activities).toHaveLength(1);
+    expect(found.activities[0].activity).toEqual("signup");
     expect(found.username).toEqual(newUser.username);
     expect(await bcrypt.compare(newUser.password, found.password)).toBeTruthy();
 

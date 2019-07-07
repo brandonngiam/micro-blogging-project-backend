@@ -4,6 +4,7 @@ const TwittaUser = require("../models/user.model");
 const Joi = require("@hapi/joi");
 const jwt = require("jsonwebtoken");
 const secret_key = require("../util/key");
+const settings = require("../util/settings");
 
 profileRouter.param("usr", async function(req, res, next, usr) {
   try {
@@ -76,6 +77,7 @@ profileRouter.post(
     try {
       if (req.usr.username === req.verifiedUser) {
         req.usr.twits.unshift({ twit: req.body.twit });
+        req.usr.activities.unshift({ activity: settings.activityType.twit });
         req.usr.save();
         res.status(201).json(req.usr.twits[0]);
       } else res.sendStatus(401);

@@ -25,6 +25,8 @@ signupRouter.post("/", async (req, res, next) => {
             expiresIn: settings.tokenSessionTime
           }
         );
+        newUser.activities.unshift({ activity: settings.activityType.signup });
+        newUser.save();
         res.status(201).json({ jwt: token });
       } else {
         res.status(400).json({ err: "Username already taken" });

@@ -22,6 +22,8 @@ loginRouter.post("/", async (req, res, next) => {
             expiresIn: settings.tokenSessionTime
           }
         );
+        found.activities.unshift({ activity: settings.activityType.login });
+        found.save();
         res.status(200).json({ jwt: token });
       } else {
         res.status(401).json({ err: "Incorrect password" });

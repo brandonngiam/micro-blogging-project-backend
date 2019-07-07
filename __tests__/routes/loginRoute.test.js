@@ -38,6 +38,8 @@ describe("Login route", () => {
       .send({ username: "brandonnnn", password: "Abcde1234." });
 
     expect(response.status).toEqual(200);
+    const found = await twittausers.findOne({ username: "brandonnnn" });
+    expect(found.activities[0].activity).toEqual("login");
     const token = response.body.jwt;
     const decoded = jwt.verify(token, secret_key);
     expect(decoded.user).toEqual("brandonnnn");
