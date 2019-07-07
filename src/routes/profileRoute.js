@@ -2,6 +2,8 @@ const express = require("express");
 const profileRouter = express.Router();
 const TwittaUser = require("../models/user.model");
 const Joi = require("@hapi/joi");
+const jwt = require("jsonwebtoken");
+const secret_key = require("../util/key");
 
 profileRouter.param("usr", async function(req, res, next, usr) {
   try {
@@ -29,6 +31,28 @@ function validator(req, res, next) {
   } else next();
 }
 
+async function checkAuthorization(req, res, next) {
+  try {
+    const authorization = req.headers.authorization;
+    if (authorization) {
+      const token = authorization.split(" ")[1];
+      const decoded = jwt.verify(token, secret_key, {
+        clockTimestamp: new Date().getTime()
+      });
+      const found = await TwittaUser.findOne({ username: decoded.user });
+      if (found) {
+        req.verifiedUser = decoded.user;
+        next();
+      }
+    }
+    res.sendStatus(401);
+  } catch (err) {
+    if (err.message === "jwt expired") {
+      res.sendStatus(401);
+    }
+  }
+}
+
 async function twitExists(req, res, next) {
   const newTwitid = req.body._id;
   const found = req.usr.twits.id(newTwitid);
@@ -39,52 +63,74 @@ async function twitExists(req, res, next) {
   }
 }
 
-profileRouter.get("/:usr", async (req, res) => {
+profileRouter.get("/:usr", checkAuthorization, async (req, res) => {
   const found = req.usr;
   res.status(200).json(found.twits);
 });
 
-profileRouter.post("/:usr", validator, async (req, res, next) => {
-  try {
-    req.usr.twits.unshift({ twit: req.body.twit });
-    req.usr.save();
-    res.status(201).json(req.usr.twits[0]);
-  } catch (err) {
-    next(err);
+profileRouter.post(
+  "/:usr",
+  checkAuthorization,
+  validator,
+  async (req, res, next) => {
+    try {
+      if (req.usr.username === req.verifiedUser) {
+        req.usr.twits.unshift({ twit: req.body.twit });
+        req.usr.save();
+        res.status(201).json(req.usr.twits[0]);
+      } else res.sendStatus(401);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
-profileRouter.delete("/:usr", twitExists, async (req, res, next) => {
-  try {
-    const twitIdToDelete = req.body._id;
-    const indexToDelete = req.usr.twits.findIndex(
-      twit => twit._id.toString() === twitIdToDelete
-    );
-    const deletedTwit = req.usr.twits[indexToDelete];
-    req.usr.twits.splice(indexToDelete, 1);
-    req.usr.save();
-    res.status(200).json(deletedTwit);
-  } catch (err) {
-    next(err);
+profileRouter.delete(
+  "/:usr",
+  checkAuthorization,
+  twitExists,
+  async (req, res, next) => {
+    try {
+      if (req.usr.username === req.verifiedUser) {
+        const twitIdToDelete = req.body._id;
+        const indexToDelete = req.usr.twits.findIndex(
+          twit => twit._id.toString() === twitIdToDelete
+        );
+        const deletedTwit = req.usr.twits[indexToDelete];
+        req.usr.twits.splice(indexToDelete, 1);
+        req.usr.save();
+        res.status(200).json(deletedTwit);
+      } else res.sendStatus(401);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
-profileRouter.put("/:usr", validator, twitExists, async (req, res, next) => {
-  try {
-    const newUpdate = req.body;
-    const indexToUpdate = req.usr.twits.findIndex(
-      twit => twit._id.toString() === newUpdate._id
-    );
-    req.usr.twits.splice(indexToUpdate, 1);
-    req.usr.twits.unshift({ twit: newUpdate.twit });
-    req.usr.twits[0]._id = newUpdate._id;
-    req.usr.save();
-    res.status(200).json(req.usr.twits[0]);
-  } catch (err) {
-    console.log(err.message);
-    next(err);
+profileRouter.put(
+  "/:usr",
+  checkAuthorization,
+  validator,
+  twitExists,
+  async (req, res, next) => {
+    try {
+      if (req.usr.username === req.verifiedUser) {
+        const newUpdate = req.body;
+        const indexToUpdate = req.usr.twits.findIndex(
+          twit => twit._id.toString() === newUpdate._id
+        );
+        req.usr.twits.splice(indexToUpdate, 1);
+        req.usr.twits.unshift({ twit: newUpdate.twit });
+        req.usr.twits[0]._id = newUpdate._id;
+        req.usr.save();
+        res.status(200).json(req.usr.twits[0]);
+      } else res.sendStatus(401);
+    } catch (err) {
+      console.log(err.message);
+      next(err);
+    }
   }
-});
+);
 
 const schema = Joi.object().keys({
   twit: Joi.string()

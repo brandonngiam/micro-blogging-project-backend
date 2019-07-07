@@ -19,7 +19,7 @@ loginRouter.post("/", async (req, res, next) => {
           { sub: found._id, iat: new Date().getTime(), user: username },
           secret_key,
           {
-            expiresIn: 1000 * 60 * 5
+            expiresIn: settings.tokenSessionTime
           }
         );
         res.status(200).json({ jwt: token });
