@@ -21,7 +21,7 @@ signupRouter.post("/", async (req, res, next) => {
           { sub: newUser._id, iat: new Date().getTime(), user: username },
           secret_key,
           {
-            expiresIn: 60 * 60
+            expiresIn: 1000 * 60 * 5
           }
         );
         res.status(201).json({ jwt: token });

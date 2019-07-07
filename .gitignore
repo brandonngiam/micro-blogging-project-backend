@@ -1,2 +1,3 @@
 node_modules/
 dropDatabase.js
+./src/util/key.js

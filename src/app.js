@@ -4,6 +4,7 @@ const app = express();
 const signupRouter = require("./routes/signupRoute");
 const loginRouter = require("./routes/loginRoute");
 const profileRouter = require("./routes/profileRoute");
+const secureRouter = require("./routes/secureRoute");
 require("./util/db");
 
 app.use(express.json());
@@ -11,6 +12,7 @@ app.use(cors());
 
 app.use("/signup", signupRouter);
 app.use("/login", loginRouter);
+app.use("/secure", secureRouter);
 app.use("/u", profileRouter);
 
 //error handler
