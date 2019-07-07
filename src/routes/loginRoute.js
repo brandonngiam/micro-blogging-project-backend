@@ -3,6 +3,7 @@ const loginRouter = express.Router();
 const TwittaUser = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const secret_key = require("../util/key");
+const bcrypt = require("bcrypt");
 
 loginRouter.post("/", async (req, res, next) => {
   try {
@@ -11,12 +12,13 @@ loginRouter.post("/", async (req, res, next) => {
     if (!found) {
       res.status(401).json({ err: "Username not found" });
     } else {
-      if (found.password === password) {
+      const isUser = await bcrypt.compare(password, found.password);
+      if (isUser) {
         const token = jwt.sign(
           { sub: found._id, iat: new Date().getTime(), user: username },
           secret_key,
           {
-            expiresIn: 60 * 60
+            expiresIn: 5
           }
         );
         res.status(200).json({ jwt: token });

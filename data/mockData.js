@@ -1,7 +1,7 @@
 const mockData = [
   {
     username: "brandonnnn",
-    password: "Abcde1234.",
+    password: "$2b$10$HDmEhlznUjFmE.ZHNPhzm.ajPV9Db6DWy5fqIRaifFwSjuG/bRN2y",
     twits: [
       {
         timeStamp: "2019-07-02T06:06:54.597Z",
@@ -17,7 +17,7 @@ const mockData = [
   },
   {
     username: "sally1988",
-    password: "12345Abde.",
+    password: "$2b$10$UVmOcwVoEZhISwRc7BOy.O42n6pk3kaiHaBKlCfA1kZ2ffrk9joTC",
     twits: [
       {
         timeStamp: "2019-07-02T06:12:36.689Z",

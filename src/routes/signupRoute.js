@@ -4,6 +4,7 @@ const TwittaUser = require("../models/user.model");
 const Joi = require("@hapi/joi");
 const jwt = require("jsonwebtoken");
 const secret_key = require("../util/key");
+const bcrypt = require("bcrypt");
 
 signupRouter.post("/", async (req, res, next) => {
   try {
@@ -13,9 +14,9 @@ signupRouter.post("/", async (req, res, next) => {
     if (!validated.error) {
       const found = await TwittaUser.findOne({ username: username });
       if (!found) {
-        await TwittaUser.create({ username, password });
+        const hash = await bcrypt.hash(password, 10);
+        await TwittaUser.create({ username: username, password: hash });
         const newUser = await TwittaUser.findOne({ username: username });
-
         const token = jwt.sign(
           { sub: newUser._id, iat: new Date().getTime(), user: username },
           secret_key,

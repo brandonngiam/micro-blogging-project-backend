@@ -4,6 +4,7 @@ const { MongoClient } = require("mongodb");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const secret_key = require("../../src/util/key");
+const bcrypt = require("bcrypt");
 
 describe("Signup route", () => {
   let connection;
@@ -29,15 +30,20 @@ describe("Signup route", () => {
   });
 
   it("POST /signup should create a new user", async () => {
-    const newUser = { username: "johnny", password: "abcd1234." };
+    const newUser = { username: "johnny", password: "12345Abde." };
     const response = await request(app)
       .post("/signup")
       .send(newUser);
 
     const twittausers = await db.collection("twittausers");
-    const found = await twittausers.findOne(newUser);
+    const hash = await bcrypt.hash(newUser.password, 10);
+    const userWithHash = {
+      username: newUser.username
+    };
+    const found = await twittausers.findOne(userWithHash);
     expect(response.status).toEqual(201);
     expect(found.username).toEqual(newUser.username);
+    expect(await bcrypt.compare(newUser.password, found.password)).toBeTruthy();
 
     const token = response.body.jwt;
     const decoded = jwt.verify(token, secret_key);

@@ -32,6 +32,8 @@ describe("Login route", () => {
   });
 
   it("POST /login should be able to login successfully", async () => {
+    const twittausers = await db.collection("twittausers");
+    console.log("Current users before", await twittausers.find().toArray());
     const response = await request(app)
       .post("/login")
       .send({ username: "brandonnnn", password: "Abcde1234." });
