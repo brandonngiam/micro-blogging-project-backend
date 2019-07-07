@@ -4,6 +4,7 @@ const TwittaUser = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const secret_key = require("../../src/util/key");
 
+//
 secureRouter.get("/", async (req, res, next) => {
   try {
     const authorization = req.headers.authorization;
