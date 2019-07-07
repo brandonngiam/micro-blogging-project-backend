@@ -1,11 +1,9 @@
 const express = require("express");
-const secureRouter = express.Router();
 const TwittaUser = require("../models/user.model");
 const jwt = require("jsonwebtoken");
-const secret_key = require("../../src/util/key");
+const secret_key = require("../util/key");
 
-//
-secureRouter.get("/", async (req, res, next) => {
+async function checkAuthorization(req, res, next) {
   try {
     const authorization = req.headers.authorization;
     if (authorization) {
@@ -14,7 +12,10 @@ secureRouter.get("/", async (req, res, next) => {
         clockTimestamp: new Date().getTime()
       });
       const found = await TwittaUser.findOne({ username: decoded.user });
-      if (found) return res.sendStatus(200);
+      if (found) {
+        req.verifiedUser = decoded.user;
+        next();
+      }
     }
     res.sendStatus(401);
   } catch (err) {
@@ -22,6 +23,6 @@ secureRouter.get("/", async (req, res, next) => {
       res.sendStatus(401);
     }
   }
-});
+}
 
-module.exports = secureRouter;
+module.exports = checkAuthorization;

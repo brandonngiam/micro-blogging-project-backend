@@ -5,6 +5,7 @@ const signupRouter = require("./routes/signupRoute");
 const loginRouter = require("./routes/loginRoute");
 const profileRouter = require("./routes/profileRoute");
 const secureRouter = require("./routes/secureRoute");
+const newsFeedRouter = require("./routes/newsfeedRoute");
 require("./util/db");
 
 app.use(express.json());
@@ -14,6 +15,7 @@ app.use("/signup", signupRouter);
 app.use("/login", loginRouter);
 app.use("/secure", secureRouter);
 app.use("/u", profileRouter);
+app.use("/newsfeed", newsFeedRouter);
 
 //error handler
 app.use(function(err, req, res, next) {
