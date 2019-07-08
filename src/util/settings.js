@@ -1,5 +1,5 @@
 settings = {
-  tokenSessionTime: 1000 * 60 * 10,
+  tokenSessionTime: 1000 * 60 * 5,
   activityType: { signup: "signup", login: "login", twit: "twit" }
 };
 

@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-//must add scenario for production
 //we have three databases: local, production, in-memory for tests
 const dbURL =
   process.env.NODE_ENV === "production"
